@@ -1,17 +1,8 @@
 import pygame
+from constants import *
 from pygame import sprite
 import math
 import random
-
-# Define colors (R, G, B)
-BLACK = [0, 0, 0]
-WHITE = [255, 255, 255]
-RED = [255, 0, 0]
-GREEN = [0, 255, 0]
-BLUE = [0, 0, 255]
-MAGENTA = [255, 0, 255]
-CYAN = [0, 255, 255]
-YELLOW = [255, 255, 0]
 
 # Window settings
 WIDTH = 640 # game window width
@@ -187,6 +178,10 @@ class Asteroid(sprite.Sprite):
             self.rect = self.image.get_rect()
             # pygame.draw.circle(self.image, RED, self.rect.center, self.radius, 2)
             self.rect.center = previous_center
+
+#------------------------------------------------------------------------------
+# Main loop:
+#------------------------------------------------------------------------------
 
 # Initialize pygame and create window
 pygame.init()
