@@ -50,10 +50,8 @@ def check_bullets_position():
     for bullet in bullets:
         if (bullet.rect.centerx > SCREEN_WIDTH + offset) or (bullet.rect.centerx < 0 - offset):
             bullet_sprites.remove(bullet)
-            print(f"Delete bullet")
         elif (bullet.rect.centery > SCREEN_HEIGHT + offset) or (bullet.rect.centery < 0 - offset):
             bullet_sprites.remove(bullet)
-            print(f"Delete bullet")
 
 #------------------------------------------------------------------------------
 # Main loop:
@@ -96,9 +94,10 @@ while game_loop:
 
     check_bullets_position()
 
-    # pygame.sprite.groupcollide(asteroids, bullets, True, True, pygame.sprite.collide_circle)
-    # pygame.sprite.spritecollide(spaceship, asteroids, True, pygame.sprite.collide_circle)
-    # pygame.sprite.spritecollide(earth, asteroids, True, pygame.sprite.collide_circle)
+    # Check the collision of the objects. In some cases we have to delete the sprite if a collision happens
+    sprites_collide = pygame.sprite.groupcollide(asteroid_sprites, bullet_sprites, True, True, pygame.sprite.collide_circle)
+    pygame.sprite.spritecollide(spaceship, asteroid_sprites, True, pygame.sprite.collide_circle)
+    pygame.sprite.spritecollide(earth, asteroid_sprites, True, pygame.sprite.collide_circle)
     
     screen.fill(BLACK)
     sprites.draw(screen)
