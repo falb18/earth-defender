@@ -41,13 +41,20 @@ game_loop = True
 
 while game_loop:
     # Set the FPS
-    clock.tick(FPS)
+    dt = clock.tick(FPS) / 1000
 
     # Process input events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game_loop = False
     
+    # Get keys status
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT] == True:
+        spaceship.rotate_left(dt)
+    elif keys[pygame.K_RIGHT] == True:
+        spaceship.rotate_right(dt)
+
     # if pygame.time.get_ticks() - spawn_asteroid_time > 3000:
     #     spawn_asteroid_time = pygame.time.get_ticks()
     #     asteroid = Asteroid()

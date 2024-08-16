@@ -33,11 +33,10 @@ class Bullet(pygame.sprite.Sprite):
 class Spaceship(pygame.sprite.Sprite):
     def __init__(self, init_pos):
         super().__init__()
-        self.x = init_pos[0]
-        self.y = init_pos[1]
-        # Create a surface and then draw a triangle on top of it
+        self.pivot = pygame.math.Vector2(init_pos)
+        # Create a surface and draw a triangle on top of it
         self.spaceship_img = pygame.Surface(SPACESHIP_IMG_SIZE, pygame.SRCALPHA)
-        # Define the point to draw the triangle
+        # Define the points for the triangle
         points = [[0,0],[0,20],[20,10]]
         pygame.draw.polygon(self.spaceship_img, YELLOW, points)
         self.image = self.spaceship_img.copy()
@@ -45,49 +44,38 @@ class Spaceship(pygame.sprite.Sprite):
         # Define radius for sprite collision circle
         self.radius = int(self.rect.width/2)
 
-        # Define the offset where the space will be positioned
+        # Define the offset coordinates where the spaceship is going to be placed
         self.radius_offset = 100
-        self.vector = pygame.math.Vector2(self.radius_offset, 0)
-        self.rect.center = [self.x + self.vector.x, self.y + self.vector.y]
+        self.offset_vector = pygame.math.Vector2(self.radius_offset, 0)
+        self.rect.center = self.pivot + self.offset_vector
 
-        # Define spaceship velocity
-        self.angular_velocity = 2
-        self.angle = 0
+        self.angular_velocity = 80
+        self.angle_rotation = 0
         
         self.last_update = pygame.time.get_ticks()
         self.last_shot = pygame.time.get_ticks()
         self.shoot_delay = 250
 
     def update(self):
-        self.check_keystate()
-        self.circular_motion()
+        # Rotate the position of the spaceship. To get the new position calculate each
+        # component of the vector
+        radians = math.radians(self.angle_rotation)
+        self.offset_vector.x = int(self.radius_offset * math.cos(radians))
+        self.offset_vector.y = int(self.radius_offset * math.sin(radians))
+        self.rotate_image()
     
-    # Do the math for rotation when key is pressed
-    def check_keystate(self):
-        keystate = pygame.key.get_pressed()
-        if keystate[pygame.K_LEFT]:
-            self.angle = (self.angle - self.angular_velocity) % 360
-        elif keystate[pygame.K_RIGHT]:
-            self.angle = (self.angle + self.angular_velocity) % 360
-        
-        radians = math.radians(self.angle)
-        self.vector.x = int(self.radius_offset * math.cos(radians))
-        self.vector.y = int(self.radius_offset * math.sin(radians))
-        
-        # if keystate[pygame.K_SPACE]:
-        #     self.shoot()
+    def rotate_left(self, delta_time):
+        self.angle_rotation -= self.angular_velocity * delta_time
+        self.angle_rotation %= 360
+
+    def rotate_right(self, delta_time):
+        self.angle_rotation += self.angular_velocity * delta_time
+        self.angle_rotation %= 360
     
-    # Rotate the image
-    def circular_motion(self):         
-        current_update = pygame.time.get_ticks()
-        if current_update - self.last_update > 1:
-            self.last_update = current_update
-            # The angle has to be negative to follow the vector circular motion
-            new_image = pygame.transform.rotate(self.spaceship_img, -self.angle)
-            self.image = new_image
-            self.rect = self.image.get_rect()
-            self.rect.centerx = self.x + self.vector.x
-            self.rect.centery = self.y + self.vector.y
+    def rotate_image(self):
+        # The angle has to be negative to follow the circular motion of the offset vector
+        self.image = pygame.transform.rotate(self.spaceship_img, -self.angle_rotation)
+        self.rect = self.image.get_rect(center = self.pivot + self.offset_vector)
     
     # Spawn bullets while the space bar is hold down
     # def shoot(self):
@@ -106,7 +94,6 @@ class Earth(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         # The radius matches the sprite collision circle
         self.radius = int(self.rect.width/2)
-        # pygame.draw.circle(self.image, RED, self.rect.center, self.radius, 2)
         self.rect.center = init_pos
     
     def update(self):
