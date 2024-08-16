@@ -7,6 +7,8 @@ BULLET_SPEED = 2.5
 SPACESHIP_IMG_SIZE = (20, 20)
 EARTH_IMG_SIZE = (150, 150)
 EARTH_RADIUS = 75
+ASTEROID_SPEED = 0.2
+ASTEROID_ROTATION_DELAY = 50 # milliseconds
 
 SHOOT_DELAY = 150 / 1000 # milliseconds
 
@@ -102,15 +104,14 @@ class Earth(pygame.sprite.Sprite):
 class Asteroid(pygame.sprite.Sprite):
     def __init__(self, screen_size, screen_radius):
         super().__init__()
-
         screen_width = screen_size[0]
         screen_height = screen_size[1]
-        # Define random size
+        # Set a random size for the asteroid
         img_size = random.randint(15,35)
         img_center = [img_size/2,img_size/2]
-        self.img_orig = pygame.Surface([img_size,img_size], pygame.SRCALPHA)
+        self.asteroid_img = pygame.Surface([img_size,img_size], pygame.SRCALPHA)
         
-        # Get the points for the polygon
+        # Calculate the points for the polygon
         points = []
         sides = 8
         poly_angle = 360/sides # Get the angle from the center of the polygon
@@ -119,23 +120,24 @@ class Asteroid(pygame.sprite.Sprite):
             x = img_center[0]+(img_size/2)*math.cos(angle_radian)
             y = img_center[1]+(img_size/2)*math.sin(angle_radian)
             points.append([x,y])
-        pygame.draw.polygon(self.img_orig, WHITE, points)
+        pygame.draw.polygon(self.asteroid_img, WHITE, points)
         
-        self.image = self.img_orig.copy()
+        self.image = self.asteroid_img.copy()
         self.rect = self.image.get_rect()
         # Define radius for sprite collision circle
-        self.radius = int(self.rect.width*0.9/2)
-        pygame.draw.circle(self.image, RED, self.rect.center, self.radius, 2)
+        radius_scale = 0.9
+        self.radius = int((self.rect.width*radius_scale)/2)
 
-        # Define random initial position:
-        # Set a random angle and sum the offset so the asteroid spawns off the screen
-        self.angular_velocity = 3
+        # Set a random initial position with a random angle. Sum an offset to the initial
+        # postion so the asteroid spawns at the edge of the screen
+        self.angular_velocity = 120
         self.asteroid_angle = random.randint(0,360)
         asteroid_angle_rad = math.radians(self.asteroid_angle)
         x = screen_width/2 - int(screen_radius * math.cos(asteroid_angle_rad))
         y = screen_height/2 - int(screen_radius * math.sin(asteroid_angle_rad))
         
-        # Limit the vector distance within the screen size
+        # Limit the position of the asteroid when spawning. It shouldn't be that far from
+        # the edge of the screen
         if x < 0:
             x = 0
         elif x > screen_width:
@@ -145,26 +147,25 @@ class Asteroid(pygame.sprite.Sprite):
         elif y > screen_height:
             y = screen_height
         
-        # Vector between the center of the earth and the initial position of the asteroid
+        # Get the vector between the center of the earth (screen) and the center of the asteroid
         self.rect.center = [x,y]
         self.vector = pygame.math.Vector2([self.rect.centerx - screen_width/2, self.rect.centery - screen_height/2])
         self.pos = self.rect.center
 
         self.last_update = pygame.time.get_ticks()
 
-    def update(self):
-        self.rotate()
-        self.pos -= self.vector * 0.0025
+    def update(self, delta_time):
+        current_time_ms = pygame.time.get_ticks()
+        if current_time_ms - self.last_update >= ASTEROID_ROTATION_DELAY:
+            self.last_update = current_time_ms
+            self.rotate_image(delta_time)
+        
+        self.pos -= self.vector * (ASTEROID_SPEED * delta_time)
         self.rect.center = self.pos
 
-    def rotate(self):
-        current_time = pygame.time.get_ticks()
-        if current_time - self.last_update > 50:
-            self.last_update = current_time
-            self.asteroid_angle = (self.asteroid_angle + self.angular_velocity) % 360
-            new_image = pygame.transform.rotate(self.img_orig, self.asteroid_angle)
-            previous_center = self.rect.center
-            self.image = new_image
-            self.rect = self.image.get_rect()
-            # pygame.draw.circle(self.image, RED, self.rect.center, self.radius, 2)
-            self.rect.center = previous_center
+    def rotate_image(self, delta_time):
+        self.asteroid_angle += self.angular_velocity * delta_time
+        self.asteroid_angle %= 360
+        self.image = pygame.transform.rotate(self.asteroid_img, self.asteroid_angle)
+        # Set the previous center of image's rect to keep the same position
+        self.rect = self.image.get_rect(center=self.rect.center)

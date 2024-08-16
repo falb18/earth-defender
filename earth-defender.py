@@ -4,6 +4,8 @@ import math
 from constants import *
 from objects import *
 
+DELAY_BEFORE_SPAWN_ASTEROID_MS = 3000
+
 # Window settings
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
@@ -25,14 +27,12 @@ pygame.display.set_caption("Earth Defender")
 # Create game objects
 spaceship = Spaceship(SCREEN_CENTER)
 earth = Earth(SCREEN_CENTER)
-asteroid = Asteroid(SCREEN_CENTER, screen_radius)
 
 sprites = pygame.sprite.Group()
 bullet_sprites = pygame.sprite.Group()
-# asteroids = pygame.sprite.Group()
+asteroid_sprites = pygame.sprite.Group()
 
 sprites.add(spaceship, earth)
-# asteroids.add(asteroid)
 
 #------------------------------------------------------------------------------
 # Game functions:
@@ -60,8 +60,10 @@ def check_bullets_position():
 #------------------------------------------------------------------------------
 
 clock = pygame.time.Clock()
-spawn_asteroid_time = pygame.time.get_ticks()
+spawn_asteroid_time = current_time_ms = pygame.time.get_ticks()
 game_loop = True
+
+asteroid_sprites.add(Asteroid(SCREEN_SIZE, screen_radius))
 
 while game_loop:
     # Set the FPS
@@ -83,15 +85,14 @@ while game_loop:
     elif keys[pygame.K_RIGHT] == True:
         spaceship.rotate_right(dt)
 
-    # if pygame.time.get_ticks() - spawn_asteroid_time > 3000:
-    #     spawn_asteroid_time = pygame.time.get_ticks()
-    #     asteroid = Asteroid()
-    #     asteroids.add(asteroid)
+    current_time_ms = pygame.time.get_ticks()
+    if current_time_ms - spawn_asteroid_time >= DELAY_BEFORE_SPAWN_ASTEROID_MS:
+        spawn_asteroid_time = current_time_ms
+        asteroid_sprites.add(Asteroid(SCREEN_SIZE, screen_radius))
     
-    # Update each sprite in the group
     sprites.update(dt)
     bullet_sprites.update(dt)
-    # asteroids.update()
+    asteroid_sprites.update(dt)
 
     check_bullets_position()
 
@@ -99,13 +100,11 @@ while game_loop:
     # pygame.sprite.spritecollide(spaceship, asteroids, True, pygame.sprite.collide_circle)
     # pygame.sprite.spritecollide(earth, asteroids, True, pygame.sprite.collide_circle)
     
-    # Draw / render sprites on the main screen
     screen.fill(BLACK)
     sprites.draw(screen)
     bullet_sprites.draw(screen)
-    # asteroids.draw(screen)
+    asteroid_sprites.draw(screen)
 
-    # Finally show eveything on the screen
     pygame.display.flip()
 
 pygame.quit()
