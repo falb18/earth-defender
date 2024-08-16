@@ -57,9 +57,13 @@ def check_bullets_position():
 # Main loop:
 #------------------------------------------------------------------------------
 
+print("Game controls:")
+print("p: pause")
+
 clock = pygame.time.Clock()
 spawn_asteroid_time = current_time_ms = pygame.time.get_ticks()
 game_loop = True
+game_pause = False
 
 asteroid_sprites.add(Asteroid(SCREEN_SIZE, screen_radius))
 
@@ -71,33 +75,38 @@ while game_loop:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game_loop = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_p:
+                game_pause = not game_pause
     
-    # Get keys status
-    keys = pygame.key.get_pressed()
+    if not game_pause:
+
+        # Get keys status
+        keys = pygame.key.get_pressed()
+        
+        if keys[pygame.K_SPACE] == True:
+            spaceship.shoot(bullet_sprites)
+
+        if keys[pygame.K_LEFT] == True:
+            spaceship.rotate_left(dt)
+        elif keys[pygame.K_RIGHT] == True:
+            spaceship.rotate_right(dt)
+
+        current_time_ms = pygame.time.get_ticks()
+        if current_time_ms - spawn_asteroid_time >= DELAY_BEFORE_SPAWN_ASTEROID_MS:
+            spawn_asteroid_time = current_time_ms
+            asteroid_sprites.add(Asteroid(SCREEN_SIZE, screen_radius))
     
-    if keys[pygame.K_SPACE] == True:
-        spaceship.shoot(bullet_sprites)
+        sprites.update(dt)
+        bullet_sprites.update(dt)
+        asteroid_sprites.update(dt)
 
-    if keys[pygame.K_LEFT] == True:
-        spaceship.rotate_left(dt)
-    elif keys[pygame.K_RIGHT] == True:
-        spaceship.rotate_right(dt)
+        check_bullets_position()
 
-    current_time_ms = pygame.time.get_ticks()
-    if current_time_ms - spawn_asteroid_time >= DELAY_BEFORE_SPAWN_ASTEROID_MS:
-        spawn_asteroid_time = current_time_ms
-        asteroid_sprites.add(Asteroid(SCREEN_SIZE, screen_radius))
-    
-    sprites.update(dt)
-    bullet_sprites.update(dt)
-    asteroid_sprites.update(dt)
-
-    check_bullets_position()
-
-    # Check the collision of the objects. In some cases we have to delete the sprite if a collision happens
-    sprites_collide = pygame.sprite.groupcollide(asteroid_sprites, bullet_sprites, True, True, pygame.sprite.collide_circle)
-    pygame.sprite.spritecollide(spaceship, asteroid_sprites, True, pygame.sprite.collide_circle)
-    pygame.sprite.spritecollide(earth, asteroid_sprites, True, pygame.sprite.collide_circle)
+        # Check the collision of the objects. In some cases we have to delete the sprite if a collision happens
+        sprites_collide = pygame.sprite.groupcollide(asteroid_sprites, bullet_sprites, True, True, pygame.sprite.collide_circle)
+        pygame.sprite.spritecollide(spaceship, asteroid_sprites, True, pygame.sprite.collide_circle)
+        pygame.sprite.spritecollide(earth, asteroid_sprites, True, pygame.sprite.collide_circle)
     
     screen.fill(BLACK)
     sprites.draw(screen)
