@@ -3,32 +3,29 @@ import math
 import random
 from constants import *
 
+BULLET_SPEED = 2.5
 SPACESHIP_IMG_SIZE = (20, 20)
 EARTH_IMG_SIZE = (150, 150)
 EARTH_RADIUS = 75
 
+SHOOT_DELAY = 150 / 1000 # milliseconds
+
 class Bullet(pygame.sprite.Sprite):
-    # It's important to get the player's vector since the bullet
-    # has to move on the same direction.
-    def __init__(self, player_center, player_vector):
+    def __init__(self, spaceship_center, direction_vector):
+        # The direction vector corresponds to the angle of the spaceship, so the bullet
+        # moves on the same direction.
         super().__init__()
         self.image = pygame.Surface((5,5))
         self.rect = self.image.get_rect()
         # The radius mathes the sprite collision circle
         self.radius = int(self.rect.width/2)
         pygame.draw.circle(self.image, GREEN, self.rect.center, self.radius, 1)
-        self.rect.center = player_center
-        self.vector = pygame.math.Vector2(player_vector)
-        self.pos = self.rect.center
+        
+        self.rect.center = spaceship_center
+        self.vector = pygame.math.Vector2(direction_vector)
     
-    def update(self):
-        pass
-        # self.pos += self.vector * 0.04
-        # self.rect.center = self.pos
-        # # If bullet is off the screen delete it
-        # if self.rect.centerx > screen_width or self.rect.centery > screen_height or \
-        #         self.rect.centerx < 0 or self.rect.centery < 0:
-        #     self.kill()
+    def update(self, delta_time):
+        self.rect.center += self.vector * (BULLET_SPEED * delta_time)
 
 class Spaceship(pygame.sprite.Sprite):
     def __init__(self, init_pos):
@@ -52,17 +49,22 @@ class Spaceship(pygame.sprite.Sprite):
         self.angular_velocity = 80
         self.angle_rotation = 0
         
-        self.last_update = pygame.time.get_ticks()
-        self.last_shot = pygame.time.get_ticks()
-        self.shoot_delay = 250
+        self.shooting_enabled = True
+        self.shoot_time = 0
 
-    def update(self):
+    def update(self, delta_time):
         # Rotate the position of the spaceship. To get the new position calculate each
         # component of the vector
         radians = math.radians(self.angle_rotation)
         self.offset_vector.x = int(self.radius_offset * math.cos(radians))
         self.offset_vector.y = int(self.radius_offset * math.sin(radians))
         self.rotate_image()
+
+        if self.shooting_enabled == False:
+            self.shoot_time += delta_time
+            if self.shoot_time >= SHOOT_DELAY:
+                self.shooting_enabled = True
+                self.shoot_time = 0
     
     def rotate_left(self, delta_time):
         self.angle_rotation -= self.angular_velocity * delta_time
@@ -77,13 +79,11 @@ class Spaceship(pygame.sprite.Sprite):
         self.image = pygame.transform.rotate(self.spaceship_img, -self.angle_rotation)
         self.rect = self.image.get_rect(center = self.pivot + self.offset_vector)
     
-    # Spawn bullets while the space bar is hold down
-    # def shoot(self):
-    #     current_time = pygame.time.get_ticks()
-    #     if current_time - self.last_shot > self.shoot_delay:
-    #         self.last_shot = current_time
-    #         bullet = Bullet(self.rect.center, self.vector)
-    #         bullets.add(bullet)
+    def shoot(self, bullets):
+        """ The function adds a new Bullet sprite to the group bullet_sprites """
+        if self.shooting_enabled == True:
+            bullets.add(Bullet(self.rect.center, self.offset_vector))
+            self.shooting_enabled = False
 
 class Earth(pygame.sprite.Sprite):
     def __init__(self, init_pos):
@@ -96,7 +96,7 @@ class Earth(pygame.sprite.Sprite):
         self.radius = int(self.rect.width/2)
         self.rect.center = init_pos
     
-    def update(self):
+    def update(self, delta_time):
         pass
 
 class Asteroid(pygame.sprite.Sprite):

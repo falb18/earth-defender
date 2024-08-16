@@ -22,14 +22,13 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 screen_radius = math.sqrt(SCREEN_WIDTH**2 + SCREEN_HEIGHT**2)/2
 pygame.display.set_caption("Earth Defender")
 
-# Create game characters
+# Create game objects
 spaceship = Spaceship(SCREEN_CENTER)
 earth = Earth(SCREEN_CENTER)
 asteroid = Asteroid(SCREEN_CENTER, screen_radius)
 
-# Create sprite group
 sprites = pygame.sprite.Group()
-# bullets = pygame.sprite.Group()
+bullet_sprites = pygame.sprite.Group()
 # asteroids = pygame.sprite.Group()
 
 sprites.add(spaceship, earth)
@@ -50,6 +49,10 @@ while game_loop:
     
     # Get keys status
     keys = pygame.key.get_pressed()
+    
+    if keys[pygame.K_SPACE] == True:
+        spaceship.shoot(bullet_sprites)
+
     if keys[pygame.K_LEFT] == True:
         spaceship.rotate_left(dt)
     elif keys[pygame.K_RIGHT] == True:
@@ -61,8 +64,8 @@ while game_loop:
     #     asteroids.add(asteroid)
     
     # Update each sprite in the group
-    sprites.update()
-    # bullets.update()
+    sprites.update(dt)
+    bullet_sprites.update(dt)
     # asteroids.update()
 
     # pygame.sprite.groupcollide(asteroids, bullets, True, True, pygame.sprite.collide_circle)
@@ -72,7 +75,7 @@ while game_loop:
     # Draw / render sprites on the main screen
     screen.fill(BLACK)
     sprites.draw(screen)
-    # bullets.draw(screen)
+    bullet_sprites.draw(screen)
     # asteroids.draw(screen)
 
     # Finally show eveything on the screen
