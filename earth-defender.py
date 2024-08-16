@@ -12,7 +12,7 @@ SCREEN_CENTER = (SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
 FPS = 60 # frames per second
 
 #------------------------------------------------------------------------------
-# Main loop:
+# Game init:
 #------------------------------------------------------------------------------
 
 # Initialize pygame and create window
@@ -33,6 +33,31 @@ bullet_sprites = pygame.sprite.Group()
 
 sprites.add(spaceship, earth)
 # asteroids.add(asteroid)
+
+#------------------------------------------------------------------------------
+# Game functions:
+#------------------------------------------------------------------------------
+
+def check_bullets_position():
+    """
+    The function checks if any of the bullets is outside the screen. In case one or more
+    bullets are outside the screen then it deletes them from the bullets_sprites group.
+    This function has to be called before checking the collision between the bullets and
+    the asteroids.
+    """
+    offset = 10
+    bullets = bullet_sprites.sprites()
+    for bullet in bullets:
+        if (bullet.rect.centerx > SCREEN_WIDTH + offset) or (bullet.rect.centerx < 0 - offset):
+            bullet_sprites.remove(bullet)
+            print(f"Delete bullet")
+        elif (bullet.rect.centery > SCREEN_HEIGHT + offset) or (bullet.rect.centery < 0 - offset):
+            bullet_sprites.remove(bullet)
+            print(f"Delete bullet")
+
+#------------------------------------------------------------------------------
+# Main loop:
+#------------------------------------------------------------------------------
 
 clock = pygame.time.Clock()
 spawn_asteroid_time = pygame.time.get_ticks()
@@ -67,6 +92,8 @@ while game_loop:
     sprites.update(dt)
     bullet_sprites.update(dt)
     # asteroids.update()
+
+    check_bullets_position()
 
     # pygame.sprite.groupcollide(asteroids, bullets, True, True, pygame.sprite.collide_circle)
     # pygame.sprite.spritecollide(spaceship, asteroids, True, pygame.sprite.collide_circle)
