@@ -55,6 +55,7 @@ class Spaceship(pygame.sprite.Sprite):
         self.shoot_time = 0
 
         self.health = 100
+        self.lives = 3
 
     def update(self, delta_time):
         # Rotate the position of the spaceship. To get the new position calculate each

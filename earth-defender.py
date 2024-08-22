@@ -75,6 +75,10 @@ def check_collision_asteroids():
         spaceship.health -= asteroid.radius * 0.5
         if spaceship.health <= 0:
             spaceship.health = 100
+            spaceship.lives -= 1
+    
+    if spaceship.lives <= 0:
+        spaceship.lives = 3
     
     # Check for collisions between asteroids and the planet
     asteroids = pygame.sprite.spritecollide(earth, asteroid_sprites, True, pygame.sprite.collide_circle)
