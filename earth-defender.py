@@ -1,5 +1,6 @@
 import pygame
 import math
+from os import path
 
 from constants import *
 from objects import *
@@ -7,11 +8,17 @@ from objects import *
 DELAY_BEFORE_SPAWN_ASTEROID_MS = 3000
 
 # Window settings
-SCREEN_WIDTH = 640
-SCREEN_HEIGHT = 480
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
 SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
 SCREEN_CENTER = (SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
 FPS = 60 # frames per second
+
+#------------------------------------------------------------------------------
+# Variables:
+#------------------------------------------------------------------------------
+
+resources_dir = "res"
 
 #------------------------------------------------------------------------------
 # Game init:
@@ -23,6 +30,11 @@ pygame.mixer.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 screen_radius = math.sqrt(SCREEN_WIDTH**2 + SCREEN_HEIGHT**2)/2
 pygame.display.set_caption("Earth Defender")
+
+# Load images
+background_img = pygame.image.load(path.join(resources_dir, "starfield-background.png"))
+background_img = background_img.convert_alpha()
+background_rect = background_img.get_rect()
 
 # Create game objects
 spaceship = Spaceship(SCREEN_CENTER)
@@ -109,6 +121,7 @@ while game_loop:
         pygame.sprite.spritecollide(earth, asteroid_sprites, True, pygame.sprite.collide_circle)
     
     screen.fill(BLACK)
+    screen.blit(background_img, background_rect)
     sprites.draw(screen)
     bullet_sprites.draw(screen)
     asteroid_sprites.draw(screen)
