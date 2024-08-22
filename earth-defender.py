@@ -14,6 +14,9 @@ SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
 SCREEN_CENTER = (SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
 FPS = 60 # frames per second
 
+BAR_LENGTH = 200
+BAR_HEIGHT = 10
+
 #------------------------------------------------------------------------------
 # Variables:
 #------------------------------------------------------------------------------
@@ -70,19 +73,31 @@ def check_collision_asteroids():
     asteroids = pygame.sprite.spritecollide(spaceship, asteroid_sprites, True, pygame.sprite.collide_circle)
     for asteroid in asteroids:
         spaceship.health -= asteroid.radius * 0.5
-        print(f"Spaceship health: {spaceship.health}")
         if spaceship.health <= 0:
-            print("Spaceship destroyed")
             spaceship.health = 100
     
     # Check for collisions between asteroids and the planet
     asteroids = pygame.sprite.spritecollide(earth, asteroid_sprites, True, pygame.sprite.collide_circle)
     for asteroid in asteroids:
         earth.health -= asteroid.radius * 0.5
-        print(f"Earth health: {earth.health}")
         if earth.health <= 0:
-            print("Earth destroyed")
             earth.health = 100
+
+def draw_gui_components():
+
+    # Draw health bar for spacheship
+    fill = (spaceship.health / 100) * BAR_LENGTH
+    outline_rect = pygame.Rect(10, 10, BAR_LENGTH, BAR_HEIGHT)
+    fill_rect = pygame.Rect(10, 10, fill, BAR_HEIGHT)
+    pygame.draw.rect(screen, GREEN, fill_rect)
+    pygame.draw.rect(screen, WHITE, outline_rect, 2)
+
+    # Draw health bar for planet
+    fill = (earth.health / 100) * BAR_LENGTH
+    outline_rect = pygame.Rect(10, 30, BAR_LENGTH, BAR_HEIGHT)
+    fill_rect = pygame.Rect(10, 30, fill, BAR_HEIGHT)
+    pygame.draw.rect(screen, CYAN, fill_rect)
+    pygame.draw.rect(screen, WHITE, outline_rect, 2)
 
 #------------------------------------------------------------------------------
 # Main loop:
@@ -140,6 +155,7 @@ while game_loop:
     
     screen.fill(BLACK)
     screen.blit(background_img, background_rect)
+    draw_gui_components()
     sprites.draw(screen)
     bullet_sprites.draw(screen)
     asteroid_sprites.draw(screen)
