@@ -66,6 +66,7 @@ def check_bullets_position():
             bullet_sprites.remove(bullet)
 
 def check_collision_asteroids():
+    # Check for collisions between asteroids and the spaceship
     asteroids = pygame.sprite.spritecollide(spaceship, asteroid_sprites, True, pygame.sprite.collide_circle)
     for asteroid in asteroids:
         spaceship.health -= asteroid.radius * 0.5
@@ -73,6 +74,15 @@ def check_collision_asteroids():
         if spaceship.health <= 0:
             print("Spaceship destroyed")
             spaceship.health = 100
+    
+    # Check for collisions between asteroids and the planet
+    asteroids = pygame.sprite.spritecollide(earth, asteroid_sprites, True, pygame.sprite.collide_circle)
+    for asteroid in asteroids:
+        earth.health -= asteroid.radius * 0.5
+        print(f"Earth health: {earth.health}")
+        if earth.health <= 0:
+            print("Earth destroyed")
+            earth.health = 100
 
 #------------------------------------------------------------------------------
 # Main loop:
@@ -127,7 +137,6 @@ while game_loop:
         # Check the collision of the objects. In some cases we have to delete the sprite if a collision happens
         sprites_collide = pygame.sprite.groupcollide(asteroid_sprites, bullet_sprites, True, True, pygame.sprite.collide_circle)
         check_collision_asteroids()
-        pygame.sprite.spritecollide(earth, asteroid_sprites, True, pygame.sprite.collide_circle)
     
     screen.fill(BLACK)
     screen.blit(background_img, background_rect)

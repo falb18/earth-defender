@@ -99,6 +99,8 @@ class Earth(pygame.sprite.Sprite):
         # The radius matches the sprite collision circle
         self.radius = int(self.rect.width/2)
         self.rect.center = init_pos
+
+        self.health = 100
     
     def update(self, delta_time):
         pass
