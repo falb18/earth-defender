@@ -21,7 +21,7 @@ BAR_HEIGHT = 10
 # Variables:
 #------------------------------------------------------------------------------
 
-resources_dir = "res"
+
 
 #------------------------------------------------------------------------------
 # Game init:
@@ -35,7 +35,7 @@ screen_radius = math.sqrt(SCREEN_WIDTH**2 + SCREEN_HEIGHT**2)/2
 pygame.display.set_caption("Earth Defender")
 
 # Load images
-background_img = pygame.image.load(path.join(resources_dir, "starfield-background.png"))
+background_img = pygame.image.load(path.join(RESOURCES_DIR, "starfield-background.png"))
 background_img = background_img.convert_alpha()
 background_rect = background_img.get_rect()
 

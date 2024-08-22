@@ -1,3 +1,5 @@
+RESOURCES_DIR = "res"
+
 # Define colors (R, G, B)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)

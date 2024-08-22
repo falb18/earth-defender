@@ -1,12 +1,16 @@
 import pygame
 import math
 import random
+from os import path
+
 from constants import *
 
 BULLET_SPEED = 2.5
-SPACESHIP_IMG_SIZE = (20, 20)
-EARTH_IMG_SIZE = (150, 150)
-EARTH_RADIUS = 75
+
+SPACESHIP_FACE_EAST = -90
+
+EARTH_DIAMETER = 100 # This is the actual radius of the planet on the image
+
 ASTEROID_SPEED = 0.2
 ASTEROID_ROTATION_DELAY = 50 # milliseconds
 
@@ -33,18 +37,17 @@ class Spaceship(pygame.sprite.Sprite):
     def __init__(self, init_pos):
         super().__init__()
         self.pivot = pygame.math.Vector2(init_pos)
-        # Create a surface and draw a triangle on top of it
-        self.spaceship_img = pygame.Surface(SPACESHIP_IMG_SIZE, pygame.SRCALPHA)
-        # Define the points for the triangle
-        points = [[0,0],[0,20],[20,10]]
-        pygame.draw.polygon(self.spaceship_img, YELLOW, points)
+        self.spaceship_img = pygame.image.load(path.join(RESOURCES_DIR, "playerShip3_green.png"))
+        self.spaceship_img = self.spaceship_img.convert_alpha()
+        self.spaceship_img = pygame.transform.rotate(self.spaceship_img, SPACESHIP_FACE_EAST)
         self.image = self.spaceship_img.copy()
         self.rect = self.image.get_rect()
         # Define radius for sprite collision circle
         self.radius = int(self.rect.width/2)
 
         # Define the offset coordinates where the spaceship is going to be placed
-        self.radius_offset = 100
+        # The way the radius offset is defined is arbitrary
+        self.radius_offset = (EARTH_DIAMETER/2) + (self.rect.width * 0.75)
         self.offset_vector = pygame.math.Vector2(self.radius_offset, 0)
         self.rect.center = self.pivot + self.offset_vector
 
@@ -93,12 +96,12 @@ class Spaceship(pygame.sprite.Sprite):
 class Earth(pygame.sprite.Sprite):
     def __init__(self, init_pos):
         super().__init__()
-        self.earth_img = pygame.Surface(EARTH_IMG_SIZE, pygame.SRCALPHA)
-        pygame.draw.circle(self.earth_img, CYAN, [75,75], EARTH_RADIUS)
+        self.earth_img = pygame.image.load(path.join(RESOURCES_DIR, "planet03.png"))
+        self.earth_img = self.earth_img.convert_alpha()
         self.image = self.earth_img.copy()
         self.rect = self.image.get_rect()
         # The radius matches the sprite collision circle
-        self.radius = int(self.rect.width/2)
+        self.radius = EARTH_DIAMETER / 2
         self.rect.center = init_pos
 
         self.health = 100
