@@ -40,6 +40,10 @@ background_img = pygame.image.load(path.join(RESOURCES_DIR, "starfield-backgroun
 background_img = background_img.convert_alpha()
 background_rect = background_img.get_rect()
 
+spaceship_life_img = pygame.image.load(path.join(RESOURCES_DIR, "playerLife3_green.png"))
+spaceship_life_img = spaceship_life_img.convert_alpha()
+spaceship_life_rect = spaceship_life_img.get_rect()
+
 # Create game objects
 spaceship = Spaceship(SCREEN_CENTER)
 earth = Earth(SCREEN_CENTER)
@@ -89,20 +93,36 @@ def check_collision_asteroids():
             earth.health = 100
 
 def draw_gui_components():
+    pos_y_spaceship_bar = 10
+    pos_y_planet_bar = pos_y_spaceship_bar + BAR_HEIGHT + 5
+    pos_y_spaceship_life = pos_y_planet_bar + BAR_HEIGHT + 5
 
     # Draw health bar for spacheship
     fill = (spaceship.health / 100) * BAR_LENGTH
-    outline_rect = pygame.Rect(10, 10, BAR_LENGTH, BAR_HEIGHT)
-    fill_rect = pygame.Rect(10, 10, fill, BAR_HEIGHT)
+    outline_rect = pygame.Rect(10, pos_y_spaceship_bar, BAR_LENGTH, BAR_HEIGHT)
+    fill_rect = pygame.Rect(10, pos_y_spaceship_bar, fill, BAR_HEIGHT)
     pygame.draw.rect(screen, GREEN, fill_rect)
     pygame.draw.rect(screen, WHITE, outline_rect, 2)
 
     # Draw health bar for planet
     fill = (earth.health / 100) * BAR_LENGTH
-    outline_rect = pygame.Rect(10, 30, BAR_LENGTH, BAR_HEIGHT)
-    fill_rect = pygame.Rect(10, 30, fill, BAR_HEIGHT)
+    outline_rect = pygame.Rect(10, pos_y_planet_bar, BAR_LENGTH, BAR_HEIGHT)
+    fill_rect = pygame.Rect(10, pos_y_planet_bar, fill, BAR_HEIGHT)
     pygame.draw.rect(screen, CYAN, fill_rect)
     pygame.draw.rect(screen, WHITE, outline_rect, 2)
+
+    # Draw the number of lives remaining
+    # We have to draw the first icon so later we can leave a gap between the icons
+    img_rect = spaceship_life_rect
+    img_rect.x = 10
+    img_rect.y = pos_y_spaceship_life
+    screen.blit(spaceship_life_img, img_rect)
+
+    for i in range(0, spaceship.lives-1):
+        img_rect = spaceship_life_rect
+        img_rect.x = 10 + (img_rect.width * (i+1)) + (5 * (i+1))
+        img_rect.y = pos_y_spaceship_life
+        screen.blit(spaceship_life_img, img_rect)
 
 #------------------------------------------------------------------------------
 # Main loop:
