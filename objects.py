@@ -13,8 +13,20 @@ EARTH_DIAMETER = 100 # This is the actual radius of the planet on the image
 
 ASTEROID_SPEED = 0.2
 ASTEROID_ROTATION_DELAY = 50 # milliseconds
+ASTEROIDS_IMG_FILES_LIST = ["meteorBrown_tiny1.png", "meteorBrown_small1.png",
+                            "meteorBrown_med1.png", "meteorBrown_big3.png"]
 
 SHOOT_DELAY = 150 / 1000 # milliseconds
+
+#------------------------------------------------------------------------------
+# Variables:
+#------------------------------------------------------------------------------
+
+asteroids_imgs = []
+
+#------------------------------------------------------------------------------
+# Objects:
+#------------------------------------------------------------------------------
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, spaceship_center, direction_vector):
@@ -114,22 +126,8 @@ class Asteroid(pygame.sprite.Sprite):
         super().__init__()
         screen_width = screen_size[0]
         screen_height = screen_size[1]
-        # Set a random size for the asteroid
-        img_size = random.randint(15,35)
-        img_center = [img_size/2,img_size/2]
-        self.asteroid_img = pygame.Surface([img_size,img_size], pygame.SRCALPHA)
-        
-        # Calculate the points for the polygon
-        points = []
-        sides = 8
-        poly_angle = 360/sides # Get the angle from the center of the polygon
-        for i in range(0,sides):
-            angle_radian = math.radians(poly_angle*i-(poly_angle/2))
-            x = img_center[0]+(img_size/2)*math.cos(angle_radian)
-            y = img_center[1]+(img_size/2)*math.sin(angle_radian)
-            points.append([x,y])
-        pygame.draw.polygon(self.asteroid_img, WHITE, points)
-        
+
+        self.asteroid_img = random.choice(asteroids_imgs)
         self.image = self.asteroid_img.copy()
         self.rect = self.image.get_rect()
         # Define radius for sprite collision circle
@@ -177,3 +175,12 @@ class Asteroid(pygame.sprite.Sprite):
         self.image = pygame.transform.rotate(self.asteroid_img, self.asteroid_angle)
         # Set the previous center of image's rect to keep the same position
         self.rect = self.image.get_rect(center=self.rect.center)
+
+#------------------------------------------------------------------------------
+# Auxiliary functions:
+#------------------------------------------------------------------------------
+
+def setup_game_objects():
+    # Create the images for the different sizes of asteroids
+    for asteroid_img_file in ASTEROIDS_IMG_FILES_LIST:
+        asteroids_imgs.append(pygame.image.load(path.join(RESOURCES_DIR, asteroid_img_file)).convert_alpha())

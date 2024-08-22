@@ -33,6 +33,7 @@ pygame.mixer.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 screen_radius = math.sqrt(SCREEN_WIDTH**2 + SCREEN_HEIGHT**2)/2
 pygame.display.set_caption("Earth Defender")
+setup_game_objects()
 
 # Load images
 background_img = pygame.image.load(path.join(RESOURCES_DIR, "starfield-background.png"))
