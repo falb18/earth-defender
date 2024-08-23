@@ -2,7 +2,7 @@
 
 This game is inspired by an old flash game named **Clash'N Slash**.
 
-<img src="./screenshots/earth-defender.png" width="" height="">
+<img src="./screenshots/earth-defender-v0.2.png" width="" height="">
 
 Python version:
 - Python 3.11.4
@@ -24,3 +24,9 @@ Once you have installed the packages run the game:
 ```bash
 python3 earth-defender.py
 ```
+
+## Resources
+
+The images were downloaded from the following artist:
+- https://opengameart.org/content/planets-8
+- https://opengameart.org/content/space-shooter-redux
