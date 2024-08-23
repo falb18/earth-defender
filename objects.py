@@ -23,6 +23,7 @@ SHOOT_DELAY = 150 / 1000 # milliseconds
 #------------------------------------------------------------------------------
 
 asteroids_imgs = []
+object_imgs = {}
 
 #------------------------------------------------------------------------------
 # Objects:
@@ -33,9 +34,7 @@ class Bullet(pygame.sprite.Sprite):
         # The direction vector corresponds to the angle of the spaceship, so the bullet
         # moves on the same direction.
         super().__init__()
-        # self.image = pygame.Surface((5,5))
-        self.image = pygame.image.load(path.join(RESOURCES_DIR, "laserGreen11.png"))
-        self.image = self.image.convert_alpha()
+        self.image = object_imgs["bullet_img"].copy()
         self.image = pygame.transform.rotate(self.image, SPACESHIP_FACE_EAST - angle_rotation)
         self.rect = self.image.get_rect()
         # The radius mathes the sprite collision circle
@@ -51,8 +50,7 @@ class Spaceship(pygame.sprite.Sprite):
     def __init__(self, init_pos):
         super().__init__()
         self.pivot = pygame.math.Vector2(init_pos)
-        self.spaceship_img = pygame.image.load(path.join(RESOURCES_DIR, "playerShip3_green.png"))
-        self.spaceship_img = self.spaceship_img.convert_alpha()
+        self.spaceship_img = object_imgs["spaceship_img"].copy()
         self.spaceship_img = pygame.transform.rotate(self.spaceship_img, SPACESHIP_FACE_EAST)
         self.image = self.spaceship_img.copy()
         self.rect = self.image.get_rect()
@@ -183,6 +181,10 @@ class Asteroid(pygame.sprite.Sprite):
 #------------------------------------------------------------------------------
 
 def setup_game_objects():
-    # Create the images for the different sizes of asteroids
+    # Load the images for the different sizes of asteroids
     for asteroid_img_file in ASTEROIDS_IMG_FILES_LIST:
         asteroids_imgs.append(pygame.image.load(path.join(RESOURCES_DIR, asteroid_img_file)).convert_alpha())
+    
+    # Load the images for the following objects
+    object_imgs["bullet_img"] = pygame.image.load(path.join(RESOURCES_DIR, "laserGreen11.png")).convert_alpha()
+    object_imgs["spaceship_img"] = pygame.image.load(path.join(RESOURCES_DIR, "playerShip3_green.png")).convert_alpha()
