@@ -29,15 +29,17 @@ asteroids_imgs = []
 #------------------------------------------------------------------------------
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, spaceship_center, direction_vector):
+    def __init__(self, spaceship_center, direction_vector, angle_rotation):
         # The direction vector corresponds to the angle of the spaceship, so the bullet
         # moves on the same direction.
         super().__init__()
-        self.image = pygame.Surface((5,5))
+        # self.image = pygame.Surface((5,5))
+        self.image = pygame.image.load(path.join(RESOURCES_DIR, "laserGreen11.png"))
+        self.image = self.image.convert_alpha()
+        self.image = pygame.transform.rotate(self.image, SPACESHIP_FACE_EAST - angle_rotation)
         self.rect = self.image.get_rect()
         # The radius mathes the sprite collision circle
         self.radius = int(self.rect.width/2)
-        pygame.draw.circle(self.image, GREEN, self.rect.center, self.radius, 1)
         
         self.rect.center = spaceship_center
         self.vector = pygame.math.Vector2(direction_vector)
@@ -102,7 +104,7 @@ class Spaceship(pygame.sprite.Sprite):
     def shoot(self, bullets):
         """ The function adds a new Bullet sprite to the group bullet_sprites """
         if self.shooting_enabled == True:
-            bullets.add(Bullet(self.rect.center, self.offset_vector))
+            bullets.add(Bullet(self.rect.center, self.offset_vector, self.angle_rotation))
             self.shooting_enabled = False
 
 class Earth(pygame.sprite.Sprite):

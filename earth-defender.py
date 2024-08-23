@@ -181,8 +181,8 @@ while game_loop:
     screen.fill(BLACK)
     screen.blit(background_img, background_rect)
     draw_gui_components()
-    sprites.draw(screen)
     bullet_sprites.draw(screen)
+    sprites.draw(screen)
     asteroid_sprites.draw(screen)
 
     pygame.display.flip()
